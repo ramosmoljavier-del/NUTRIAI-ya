@@ -1,12 +1,11 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile, DietPlan, FoodAnalysis } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// ⚠️ AQUÍ ESTÁ TU CLAVE PUESTA DIRECTAMENTE
+const ai = new GoogleGenAI({ apiKey: "AIzaSyCzNudeombMbkCSc2an6iL8GiU-GSckMwg" });
 
 export const generateDietPlan = async (profile: UserProfile): Promise<DietPlan> => {
-  // Definición de factores de actividad para precisión algorítmica
-  const activityFactors = {
+  const activityFactors: Record<string, number> = {
     sedentary: 1.2,
     light: 1.375,
     moderate: 1.55,
@@ -40,7 +39,7 @@ export const generateDietPlan = async (profile: UserProfile): Promise<DietPlan> 
   }`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.0-flash', 
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -70,7 +69,9 @@ export const generateDietPlan = async (profile: UserProfile): Promise<DietPlan> 
     }
   });
 
-  return JSON.parse(response.text.trim());
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
 };
 
 export const analyzeFoodImage = async (base64Image: string): Promise<FoodAnalysis> => {
@@ -78,8 +79,8 @@ export const analyzeFoodImage = async (base64Image: string): Promise<FoodAnalysi
   const textPart = { text: "Analiza esta comida. Sé extremadamente realista con las porciones. Si ves aceite o salsas, inclúyelo en el cálculo. Estima el gramaje de cada ingrediente antes de dar el total. Responde en español y en formato JSON." };
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: { parts: [imagePart, textPart] },
+    model: 'gemini-2.0-flash',
+    contents: { role: "user", parts: [imagePart, textPart] },
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -95,7 +96,9 @@ export const analyzeFoodImage = async (base64Image: string): Promise<FoodAnalysi
     }
   });
 
-  return JSON.parse(response.text.trim());
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
 };
 
 export const chatWithNutriBot = async (message: string, profile: UserProfile) => {
@@ -110,21 +113,21 @@ export const chatWithNutriBot = async (message: string, profile: UserProfile) =>
   Responde SIEMPRE en español, de forma técnica pero motivadora.`;
 
   const chat = ai.chats.create({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.0-flash',
     config: {
       systemInstruction: context,
     }
   });
   
-  const response = await chat.sendMessage({ message });
-  return response.text;
+  const response = await chat.sendMessage({ part: { text: message } });
+  return response.text || "Lo siento, no pude procesar eso.";
 };
 
 export const generateShoppingList = async (dietPlan: DietPlan) => {
   const prompt = `Basado en este plan diario: ${JSON.stringify(dietPlan)}, genera una lista de la compra semanal (multiplica por 7 cantidades aproximadas). Responde en español de forma muy organizada.`;
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.0-flash',
     contents: prompt
   });
-  return response.text;
+  return response.text || "Error generando lista.";
 };
