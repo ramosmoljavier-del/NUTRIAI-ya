@@ -1,0 +1,7 @@
+{
+  "name": "NutriAI ",
+  "description": "Una aplicación avanzada de nutrición que utiliza IA para generar planes de dieta personalizados y analizar las calorías de tus platos mediante fotografías.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
