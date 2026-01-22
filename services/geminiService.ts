@@ -131,3 +131,4 @@ export const generateShoppingList = async (dietPlan: DietPlan) => {
   });
   return response.text || "Error generando lista.";
 };
+// Forzando actualización de Vercel v2
