@@ -1,10 +1,10 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { UserProfile, DietPlan, FoodAnalysis } from "../types";
 
 // ⚠️ TU CLAVE API
 const ai = new GoogleGenAI({ apiKey: "AIzaSyCzNudeombMbkCSc2an6iL8GiU-GSckMwg" });
 
-// USAMOS EL MODELO 1.5 FLASH (El más rápido y estable)
+// MODELO (Usamos el flash 1.5)
 const MODEL_NAME = 'gemini-1.5-flash';
 
 export const generateDietPlan = async (profile: UserProfile): Promise<DietPlan> => {
@@ -19,52 +19,55 @@ export const generateDietPlan = async (profile: UserProfile): Promise<DietPlan> 
     - Objetivo: ${profile.goal} (Factor ${factor}).
     - Dieta: ${profile.dietType}.
     
-    Genera un plan diario JSON válido con: dailyCalories, macros (protein, carbs, fats), y meals (breakfast, lunch, snack, dinner).`;
+    Genera un plan diario JSON válido con esta estructura exacta:
+    {
+      "dailyCalories": número,
+      "macros": { "protein": número, "carbs": número, "fats": número },
+      "meals": {
+        "breakfast": { "name": "...", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": "..." },
+        "lunch": { ...igual... },
+        "snack": { ...igual... },
+        "dinner": { ...igual... }
+      }
+    }`;
+
+    // CONFIGURACIÓN "SAFE MODE" (Sin tipos estrictos para evitar errores)
+    const config: any = {
+      responseMimeType: "application/json",
+    };
 
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
       contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            dailyCalories: { type: Type.NUMBER },
-            macros: {
-              type: Type.OBJECT,
-              properties: {
-                protein: { type: Type.NUMBER },
-                carbs: { type: Type.NUMBER },
-                fats: { type: Type.NUMBER }
-              }
-            },
-            meals: {
-              type: Type.OBJECT,
-              properties: {
-                breakfast: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, calories: { type: Type.NUMBER }, protein: { type: Type.NUMBER }, carbs: { type: Type.NUMBER }, fats: { type: Type.NUMBER }, description: { type: Type.STRING } } },
-                lunch: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, calories: { type: Type.NUMBER }, protein: { type: Type.NUMBER }, carbs: { type: Type.NUMBER }, fats: { type: Type.NUMBER }, description: { type: Type.STRING } } },
-                snack: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, calories: { type: Type.NUMBER }, protein: { type: Type.NUMBER }, carbs: { type: Type.NUMBER }, fats: { type: Type.NUMBER }, description: { type: Type.STRING } } },
-                dinner: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, calories: { type: Type.NUMBER }, protein: { type: Type.NUMBER }, carbs: { type: Type.NUMBER }, fats: { type: Type.NUMBER }, description: { type: Type.STRING } } }
-              }
-            }
-          }
-        }
-      }
+      config: config
     });
 
-    // CORRECCIÓN AQUÍ: Usamos .text como propiedad, no función
-    const text = response.text; 
-    if (!text) throw new Error("No response from AI");
-    return JSON.parse(text);
+    // Intentamos obtener el texto de forma segura
+    let text = "";
+    if (typeof response.text === 'function') {
+        text = response.text(); 
+    } else if (typeof response.text === 'string') {
+        text = response.text;
+    } else {
+        // Fallback para estructuras raras de respuesta
+        text = JSON.stringify(response); 
+    }
+
+    // Limpieza por si la IA añade comillas extra
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    console.log("Respuesta IA Dieta:", cleanText); // Para depurar si falla
+    return JSON.parse(cleanText);
+
   } catch (error) {
-    console.error("ERROR GENERANDO DIETA:", error);
+    console.error("ERROR CRÍTICO EN DIETA:", error);
     throw error;
   }
 };
 
 export const chatWithNutriBot = async (message: string, profile: UserProfile) => {
   try {
-    const context = `Eres NutriBot. Usuario: ${profile.weight}kg, Meta: ${profile.goal}. Responde breve y motivador.`;
+    const context = `Eres NutriBot. Usuario: ${profile.weight}kg, Meta: ${profile.goal}. Responde breve y motivador en español.`;
     
     const chat = ai.chats.create({
       model: MODEL_NAME,
@@ -72,7 +75,16 @@ export const chatWithNutriBot = async (message: string, profile: UserProfile) =>
     });
     
     const response = await chat.sendMessage({ part: { text: message } });
-    return response.text || "No pude procesar eso.";
+    
+    // Extracción segura del texto
+    let text = "";
+    if (typeof response.text === 'function') {
+        text = response.text();
+    } else if (typeof response.text === 'string') {
+        text = response.text;
+    }
+
+    return text || "No pude procesar eso.";
   } catch (error) {
     console.error("ERROR CHAT:", error);
     return "Error de conexión con NutriBot.";
@@ -82,29 +94,25 @@ export const chatWithNutriBot = async (message: string, profile: UserProfile) =>
 export const analyzeFoodImage = async (base64Image: string): Promise<FoodAnalysis> => {
   try {
     const imagePart = { inlineData: { mimeType: 'image/jpeg', data: base64Image } };
-    const prompt = "Analiza esta comida. JSON: dishName, estimatedCalories, macros (protein, carbs, fats), ingredients (lista).";
+    const prompt = "Analiza esta comida. Responde SOLO en JSON con: dishName, estimatedCalories, macros (protein, carbs, fats), ingredients (array strings).";
+
+    const config: any = { responseMimeType: "application/json" };
 
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
       contents: { role: "user", parts: [imagePart, { text: prompt }] },
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            dishName: { type: Type.STRING },
-            estimatedCalories: { type: Type.NUMBER },
-            macros: { type: Type.OBJECT, properties: { protein: { type: Type.NUMBER }, carbs: { type: Type.NUMBER }, fats: { type: Type.NUMBER } } },
-            ingredients: { type: Type.ARRAY, items: { type: Type.STRING } },
-            confidence: { type: Type.NUMBER }
-          }
-        }
-      }
+      config: config
     });
 
-    const text = response.text;
-    if (!text) throw new Error("No response");
-    return JSON.parse(text);
+    let text = "";
+    if (typeof response.text === 'function') {
+        text = response.text();
+    } else if (typeof response.text === 'string') {
+        text = response.text;
+    }
+
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanText);
   } catch (error) {
     console.error("ERROR VISION:", error);
     throw error;
@@ -117,10 +125,15 @@ export const generateShoppingList = async (dietPlan: DietPlan) => {
       model: MODEL_NAME,
       contents: `Crea lista de compra para: ${JSON.stringify(dietPlan)}`
     });
-    return response.text || "Error generando lista.";
+    
+    let text = "";
+    if (typeof response.text === 'function') {
+        text = response.text();
+    } else if (typeof response.text === 'string') {
+        text = response.text;
+    }
+    return text || "Error generando lista.";
   } catch (error) {
     return "Error generando lista.";
-  }
-};
   }
 };
