@@ -6,8 +6,7 @@ const API_KEY = "AIzaSyCzNudeombMbkCSc2an6iL8GiU-GSckMwg";
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Usamos el modelo flash (rápido y barato)
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 export const generateDietPlan = async (profile: UserProfile): Promise<DietPlan> => {
   try {
     const prompt = `
