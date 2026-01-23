@@ -1,10 +1,6 @@
 // @ts-nocheck
+/* MODO OFFLINE - DATOS FIJOS */
 
-/* MODO OFFLINE TOTAL - SIN LIBRERÍAS
-   Este archivo devuelve datos fijos. No requiere internet ni API keys.
-*/
-
-// DATOS FIJOS
 const DIET_MOCK = {
   dailyCalories: 2000,
   macros: { protein: 150, carbs: 200, fats: 65 },
@@ -23,24 +19,20 @@ const FOOD_MOCK = {
   ingredients: ["Ingrediente 1", "Ingrediente 2", "Ingrediente 3"]
 };
 
-// FUNCIONES QUE SIMULAN TRABAJAR
-// Usamos 'any' para evitar que TypeScript se queje si los tipos no coinciden
-
 export const generateDietPlan = async (profile: any) => {
-  await new Promise(r => setTimeout(r, 1000)); // Espera falsa
+  await new Promise(r => setTimeout(r, 1000));
   return DIET_MOCK;
 };
 
 export const analyzeFoodImage = async (base64Image: string) => {
-  await new Promise(r => setTimeout(r, 1500)); // Espera falsa
+  await new Promise(r => setTimeout(r, 1500));
   return FOOD_MOCK;
 };
 
 export const chatWithNutriBot = async (message: string, profile: any) => {
-  await new Promise(r => setTimeout(r, 800)); // Espera falsa
-  return "¡Hola! Como soy una demo, te recomiendo seguir tu plan de comidas y beber agua. ¡Ánimo!";
+  return "¡Hola! Sigue así con tu dieta.";
 };
 
 export const generateShoppingList = async (dietPlan: any) => {
-  return "Pollo, Arroz, Huevos, Avena, Aceite de Oliva, Verduras variadas.";
+  return "Pollo, Arroz, Huevos, Avena.";
 };
