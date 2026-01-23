@@ -1,35 +1,65 @@
 // @ts-nocheck
 
-// --- DATOS FALSOS PARA LA PRESENTACIÓN ---
-const DIETA_DEMO = {
-  dailyCalories: 2200,
-  macros: { protein: 160, carbs: 220, fats: 70 },
+// --- MODO SIMULACIÓN PARA EXAMEN ---
+
+const MOCK_DIET = {
+  dailyCalories: 2000,
+  macros: { protein: 150, carbs: 200, fats: 65 },
   meals: {
     breakfast: { 
       name: "Tortitas de Avena", 
-      calories: 450, 
-      protein: 20, carbs: 60, fats: 10, 
-      description: "Tortitas con claras de huevo y plátano." 
+      calories: 400, 
+      protein: 20, carbs: 50, fats: 10, 
+      description: "Tortitas con plátano y claras." 
     },
     lunch: { 
-      name: "Pollo a la Plancha", 
+      name: "Pollo con Arroz", 
       calories: 700, 
-      protein: 50, carbs: 70, fats: 20, 
-      description: "Pechuga de pollo con arroz integral y verduras." 
+      protein: 50, carbs: 80, fats: 15, 
+      description: "Pechuga de pollo a la plancha con arroz blanco." 
     },
     snack: { 
-      name: "Yogur y Nueces", 
-      calories: 350, 
+      name: "Yogur y Almendras", 
+      calories: 300, 
       protein: 15, carbs: 20, fats: 20, 
-      description: "Yogur griego natural con almendras." 
+      description: "Yogur griego natural." 
     },
     dinner: { 
-      name: "Merluza al Horno", 
-      calories: 700, 
-      protein: 40, carbs: 40, fats: 25, 
-      description: "Pescado blanco con patatas al vapor." 
+      name: "Pescado al Horno", 
+      calories: 600, 
+      protein: 35, carbs: 30, fats: 25, 
+      description: "Merluza con verduras asadas." 
     }
   }
+};
+
+const MOCK_FOOD = {
+  dishName: "Plato Saludable",
+  estimatedCalories: 500,
+  macros: { protein: 30, carbs: 45, fats: 20 },
+  ingredients: ["Pollo", "Verduras", "Aceite"]
+};
+
+// Usamos 'any' para que no de errores de tipo nunca
+export const generateDietPlan = async (profile: any) => {
+  // Simular espera de 1 segundo
+  await new Promise(r => setTimeout(r, 1000)); 
+  return MOCK_DIET;
+};
+
+export const analyzeFoodImage = async (base64Image: any) => {
+  // Simular espera
+  await new Promise(r => setTimeout(r, 1000));
+  return MOCK_FOOD;
+};
+
+export const chatWithNutriBot = async (message: any, profile: any) => {
+  // Respuesta automática
+  return "¡Hola! Veo que vas muy bien. Sigue así con tu dieta y no olvides beber agua.";
+};
+
+export const generateShoppingList = async (dietPlan: any) => {
+  return "Pollo, Arroz, Avena, Huevos, Aceite de Oliva.";
 };
 
 const ANALISIS_DEMO = {
