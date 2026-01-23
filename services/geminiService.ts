@@ -1,52 +1,37 @@
 // @ts-nocheck
-/* MODO EXAMEN: DATOS SIMULADOS */
+/* MODO SIMULACRO TOTAL */
 
-// No importamos nada para evitar errores de compilación
-
-const MOCK_DIET = {
-  dailyCalories: 2100,
-  macros: { protein: 160, carbs: 220, fats: 70 },
+const MOCK_DATA = {
+  dailyCalories: 2000,
+  macros: { protein: 150, carbs: 200, fats: 60 },
   meals: {
-    breakfast: { 
-      name: "Tortitas de Avena", 
-      calories: 450, 
-      protein: 20, carbs: 60, fats: 10, 
-      description: "Tortitas con claras y plátano." 
-    },
-    lunch: { 
-      name: "Pollo con Arroz", 
-      calories: 700, 
-      protein: 50, carbs: 80, fats: 15, 
-      description: "Pechuga de pollo a la plancha con arroz." 
-    },
-    snack: { 
-      name: "Yogur y Nueces", 
-      calories: 300, 
-      protein: 15, carbs: 20, fats: 15, 
-      description: "Yogur griego con almendras." 
-    },
-    dinner: { 
-      name: "Merluza con Verduras", 
-      calories: 650, 
-      protein: 40, carbs: 30, fats: 25, 
-      description: "Pescado blanco al horno." 
-    }
+    breakfast: { name: "Avena con frutas", calories: 400, protein: 15, carbs: 60, fats: 10, description: "Desayuno equilibrado." },
+    lunch: { name: "Pollo con arroz", calories: 700, protein: 50, carbs: 70, fats: 15, description: "Almuerzo alto en proteína." },
+    snack: { name: "Frutos secos", calories: 200, protein: 5, carbs: 10, fats: 15, description: "Snack saludable." },
+    dinner: { name: "Ensalada completa", calories: 700, protein: 30, carbs: 50, fats: 20, description: "Cena ligera." }
   }
 };
 
-const MOCK_FOOD = {
-  dishName: "Plato Saludable (Detectado)",
-  estimatedCalories: 520,
-  macros: { protein: 35, carbs: 45, fats: 20 },
-  ingredients: ["Pollo", "Arroz", "Verduras"]
+export const generateDietPlan = async () => {
+  return MOCK_DATA;
 };
 
-// Funciones falsas que devuelven los datos de arriba
-export const generateDietPlan = async (profile) => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return MOCK_DIET;
+export const analyzeFoodImage = async () => {
+  return {
+    dishName: "Plato detectado",
+    estimatedCalories: 500,
+    macros: { protein: 30, carbs: 40, fats: 20 },
+    ingredients: ["Ingrediente 1", "Ingrediente 2"]
+  };
 };
 
+export const chatWithNutriBot = async () => {
+  return "¡Hola! Todo va según el plan. ¿En qué más te ayudo?";
+};
+
+export const generateShoppingList = async () => {
+  return "Pollo, Arroz, Avena, Verduras.";
+};
 export const analyzeFoodImage = async (base64Image) => {
   await new Promise(resolve => setTimeout(resolve, 1500));
   return MOCK_FOOD;
