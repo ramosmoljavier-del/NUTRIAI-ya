@@ -1,84 +1,46 @@
 // @ts-nocheck
 
-/* MODO EMERGENCIA: SIN LIBRERÍAS EXTERNAS.
-  Este código simula que la IA funciona devolviendo datos fijos.
-  Esto garantiza que la web CARGUE y FUNCIONE para la presentación.
+/* MODO OFFLINE TOTAL - SIN LIBRERÍAS
+   Este archivo devuelve datos fijos. No requiere internet ni API keys.
 */
 
-// --- DATOS FIJOS PARA QUE SE VEA BONITO ---
-const DIETA_EJEMPLO = {
-  dailyCalories: 2150,
-  macros: { protein: 160, carbs: 220, fats: 70 },
+// DATOS FIJOS
+const DIET_MOCK = {
+  dailyCalories: 2000,
+  macros: { protein: 150, carbs: 200, fats: 65 },
   meals: {
-    breakfast: { 
-      name: "Tortitas de Avena y Plátano", 
-      calories: 450, 
-      protein: 20, 
-      carbs: 60, 
-      fats: 10, 
-      description: "Deliciosas tortitas con claras de huevo, avena y rodajas de fruta fresca." 
-    },
-    lunch: { 
-      name: "Bowl de Pollo y Quinoa", 
-      calories: 700, 
-      protein: 45, 
-      carbs: 75, 
-      fats: 20, 
-      description: "Pechuga de pollo a la plancha con base de quinoa, aguacate y tomate." 
-    },
-    snack: { 
-      name: "Yogur Griego con Nueces", 
-      calories: 300, 
-      protein: 15, 
-      carbs: 20, 
-      fats: 15, 
-      description: "Yogur natural cremoso con un puñado de frutos secos." 
-    },
-    dinner: { 
-      name: "Salmón al Horno con Verduras", 
-      calories: 700, 
-      protein: 40, 
-      carbs: 45, 
-      fats: 25, 
-      description: "Lomo de salmón horneado con espárragos y patata asada." 
-    }
+    breakfast: { name: "Tortitas de Avena", calories: 400, protein: 20, carbs: 50, fats: 10, description: "Tortitas con fruta." },
+    lunch: { name: "Pollo y Arroz", calories: 700, protein: 50, carbs: 80, fats: 15, description: "Plato combinado saludable." },
+    snack: { name: "Yogur y Frutos Secos", calories: 300, protein: 15, carbs: 20, fats: 20, description: "Snack rápido." },
+    dinner: { name: "Pescado con Verduras", calories: 600, protein: 35, carbs: 30, fats: 25, description: "Cena ligera." }
   }
 };
 
-const ANALISIS_COMIDA_EJEMPLO = {
-  dishName: "Plato Saludable Detectado",
-  estimatedCalories: 520,
-  macros: { protein: 35, carbs: 40, fats: 20 },
-  ingredients: ["Proteína magra", "Verduras variadas", "Carbohidrato complejo", "Grasas saludables"]
+const FOOD_MOCK = {
+  dishName: "Plato Detectado",
+  estimatedCalories: 500,
+  macros: { protein: 30, carbs: 45, fats: 20 },
+  ingredients: ["Ingrediente 1", "Ingrediente 2", "Ingrediente 3"]
 };
 
-// --- FUNCIONES QUE SOLO DEVUELVEN LOS DATOS (SIN CONECTAR A NADA) ---
+// FUNCIONES QUE SIMULAN TRABAJAR
+// Usamos 'any' para evitar que TypeScript se queje si los tipos no coinciden
 
-export const generateDietPlan = async (profile) => {
-  console.log("Generando dieta simulada para...", profile);
-  // Esperamos 1 segundo para que parezca que "piensa"
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return DIETA_EJEMPLO;
+export const generateDietPlan = async (profile: any) => {
+  await new Promise(r => setTimeout(r, 1000)); // Espera falsa
+  return DIET_MOCK;
 };
 
-export const analyzeFoodImage = async (base64Image) => {
-  console.log("Analizando imagen simulada...");
-  // Esperamos 1.5 segundos
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return ANALISIS_COMIDA_EJEMPLO;
+export const analyzeFoodImage = async (base64Image: string) => {
+  await new Promise(r => setTimeout(r, 1500)); // Espera falsa
+  return FOOD_MOCK;
 };
 
-export const chatWithNutriBot = async (message, profile) => {
-  // Respuestas automáticas simples para que el chat no se quede mudo
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  if (message.toLowerCase().includes("hola")) {
-    return "¡Hola! Soy NutriBot. Veo que quieres mejorar tu alimentación. ¿En qué puedo ayudarte hoy?";
-  }
-  return "¡Es una excelente pregunta! Basado en tu perfil, te recomiendo mantener la constancia, beber 2 litros de agua y seguir el plan de comidas. ¡Tú puedes!";
+export const chatWithNutriBot = async (message: string, profile: any) => {
+  await new Promise(r => setTimeout(r, 800)); // Espera falsa
+  return "¡Hola! Como soy una demo, te recomiendo seguir tu plan de comidas y beber agua. ¡Ánimo!";
 };
 
-export const generateShoppingList = async (dietPlan) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return "Pechuga de pollo, Quinoa, Avena, Huevos, Plátanos, Nueces, Salmón, Espárragos, Yogur Griego.";
+export const generateShoppingList = async (dietPlan: any) => {
+  return "Pollo, Arroz, Huevos, Avena, Aceite de Oliva, Verduras variadas.";
 };
